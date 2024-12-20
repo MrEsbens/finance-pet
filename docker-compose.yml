@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   app:
-    image: php:8.3.14-fpm
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: yii-app
     volumes:
       - .:/var/www/html
