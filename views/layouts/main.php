@@ -5,7 +5,6 @@
 
 use app\assets\AppAsset;
 use yii\bootstrap5\Breadcrumbs;
-use yii\bootstrap5\ButtonDropdown;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
@@ -39,7 +38,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     $menuItemsLeft = [];
     $menuItemsRight = [];
     if (Yii::$app->user->isGuest) {
-        $menuItemsRight[] = ['label' => 'Вход', 'url' => ['/site/login']];
+        $menuItemsRight[] = ['label' => 'Вход', 'url' => ['/registration']];
     } else {
         $menuItemsRight[] = [
             'label' => '<i class="glyphicon glyphicon-user"></i> ' . Yii::$app->user->identity->username,

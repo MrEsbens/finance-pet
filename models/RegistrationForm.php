@@ -2,22 +2,21 @@
 
 namespace app\models;
 use yii\base\Model;
+use app\components\validators\PasswordValidator;
 
 class RegistrationForm extends Model {
 
-    public $login;
-    public $password;
-    public $firstName;
-    public $lastName;
+    public $username;
     public $email;
-    public $phone;
+    public $password;
 
     // Валидация параметров с формы
-    public function rules() {
-        return [[
-            ['login', 'password', 'firstName', 'lastName', 'email'], 'required'],
+    public function rules(): array {
+        return [
+            [['username', 'password', 'email'], 'required'],
+            ['username', 'unique', 'targetClass' => User::class, 'targetAttribute' => 'username'],
             ['email', 'email'],
-            ['password', 'string', 'min' => 10]
+            ['password', PasswordValidator::class],
         ];
     }
 

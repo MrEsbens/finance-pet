@@ -11,8 +11,7 @@ use yii\base\Model;
  * @property-read User|null $user
  *
  */
-class LoginForm extends Model
-{
+class LoginForm extends Model{
     public $username;
     public $password;
     public $rememberMe = true;
@@ -23,8 +22,7 @@ class LoginForm extends Model
     /**
      * @return array the validation rules.
      */
-    public function rules()
-    {
+    public function rules(){
         return [
             // username and password are both required
             [['username', 'password'], 'required'],
