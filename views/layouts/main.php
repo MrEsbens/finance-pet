@@ -38,13 +38,13 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     $menuItemsLeft = [];
     $menuItemsRight = [];
     if (Yii::$app->user->isGuest) {
-        $menuItemsRight[] = ['label' => 'Вход', 'url' => ['/registration']];
+        $menuItemsRight[] = ['label' => 'Вход', 'url' => ['/login']];
     } else {
         $menuItemsRight[] = [
-            'label' => '<i class="glyphicon glyphicon-user"></i> ' . Yii::$app->user->identity->username,
+            'label' =>  Yii::$app->user->identity->username,
             'items' => [
-                ['label' => '<i class="glyphicon glyphicon-cog"></i> Настройки', 'url' => ['/site/settings']],
-                ['label' => '<i class="glyphicon glyphicon-off"></i> Выход', 'url' => ['/site/logout']],
+                ['label' => 'Настройки', 'url' => ['/settings']],
+                ['label' => 'Выход', 'url' => ['/login/logout']],
             ],
         ];
     }

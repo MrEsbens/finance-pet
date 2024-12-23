@@ -12,15 +12,24 @@ class User extends ActiveRecord implements IdentityInterface{
     }
 
     public static function findIdentity($id){
-        return static::findOne($id);
+        return self::findOne($id);
+    }
+
+    public static  function  findByUsername($username)
+    {
+        return self::findOne(['username' => $username]);
     }
 
     public static function findIdentityByAccessToken($token, $type = null){
-        return static::findOne(['access_token' => $token]);
+        return self::findOne(['access_token' => $token]);
     }
 
     public function getId(): string{
         return $this->id;
+    }
+
+    public function getPasswordHash(): string{
+        return $this->password_hash;
     }
 
     public function getAuthKey(): string{
