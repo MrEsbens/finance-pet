@@ -2,7 +2,7 @@
 
 /** @var yii\web\View $this */
 
-$this->title = 'My Yii Application';
+$this->title = 'BudgetGuru';
 ?>
 <div class="body-container text-center">
     <div class="main-title">Добро пожаловать в BudgetGuru!</div>

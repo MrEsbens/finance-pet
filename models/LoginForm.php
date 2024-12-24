@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use app\components\validators\PasswordValidator;
 use Yii;
 use yii\base\Model;
 

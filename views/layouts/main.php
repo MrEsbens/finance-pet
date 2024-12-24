@@ -40,6 +40,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     if (Yii::$app->user->isGuest) {
         $menuItemsRight[] = ['label' => 'Вход', 'url' => ['/login']];
     } else {
+        $menuItemsLeft[] = [
+                'label' => 'Листы бюджета', 'url' => ['/budget-sheets'],
+        ];
         $menuItemsRight[] = [
             'label' =>  Yii::$app->user->identity->username,
             'items' => [

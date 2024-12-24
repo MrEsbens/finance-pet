@@ -8,7 +8,7 @@ use yii\helpers\Html;
 /* @var $form yii\widgets\ActiveForm */
 /* @var $model app\models\LoginForm */
 
-$this->title = 'Registration';
+$this->title = 'Регистрация';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
