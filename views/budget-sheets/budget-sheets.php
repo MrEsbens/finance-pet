@@ -9,13 +9,12 @@ $this->title = 'Мои листы бюджета';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container mt-5">
-    <h1 class="text-center">Листы бюджета</h1>
     <div class="row">
         <?php foreach ($budget_sheets as $sheet): ?>
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title"><?=  Html::encode($sheet['name']); ?></h5>
+                        <?=Html::a('<h5>'.Html::encode($sheet['name']).'</h5>', Url::to(['budget-sheets/show', 'id' => Html::encode($sheet['id']) ]), ['class' => 'card-title'])?>
                         <div class="d-flex justify-content-between">
                             <?=Html::a('Переименовать', Url::to(['budget-sheets/update', 'id' => Html::encode($sheet['id']) ]), ['class' => 'btn btn-warning'])?>
                             <?=Html::a('Удалить', Url::to(['budget-sheets/delete', 'id' => Html::encode($sheet['id']) ]), ['class' => 'btn btn-danger'])?>

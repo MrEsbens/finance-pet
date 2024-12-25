@@ -58,5 +58,8 @@ class BudgetSheetsController extends Controller{
             throw new NotFoundHttpException('Budget sheet not found.');
         }
     }
-
+    public function actionShow(){
+        $budget_sheet = BudgetSheet::findOne(Yii::$app->request->get('id'));
+        return $this->render('sheet-show', ['budget_sheet'=>$budget_sheet]);
+    }
 }
