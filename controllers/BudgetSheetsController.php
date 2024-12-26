@@ -6,6 +6,7 @@ use app\models\BudgetSheet;
 use app\models\CreateBudgetSheet;
 use Yii;
 use yii\web\NotFoundHttpException;
+use app\models\Transaction;
 
 class BudgetSheetsController extends Controller{
     public function actionIndex(){
@@ -37,6 +38,7 @@ class BudgetSheetsController extends Controller{
             $budget_sheet = BudgetSheet::findOne(Yii::$app->request->post('CreateBudgetSheet')['id']);
             if($budget_sheet) {
                 $budget_sheet->name = $model->name;
+                $budget_sheet->updated_at = date('Y-m-d H:i:s', time());
 
                 if($budget_sheet->save()){
                     $this->redirect(['budget-sheets/index']);
@@ -48,7 +50,6 @@ class BudgetSheetsController extends Controller{
         return $this->render('create-budget-sheet', ['budget_sheet' => $model, 'action' => 'update']);
     }
     public function actionDelete(){
-        $model = new createBudgetSheet();
         $budget_sheet = BudgetSheet::findOne(Yii::$app->request->get('id'));
         if($budget_sheet) {
             if($budget_sheet->delete()){
@@ -60,6 +61,9 @@ class BudgetSheetsController extends Controller{
     }
     public function actionShow(){
         $budget_sheet = BudgetSheet::findOne(Yii::$app->request->get('id'));
+//        if(!empty(Yii::$app->request->get('month')) && !empty(Yii::$app->request->get('year'))){
+//            $transactions
+//        }
         return $this->render('sheet-show', ['budget_sheet'=>$budget_sheet]);
     }
 }

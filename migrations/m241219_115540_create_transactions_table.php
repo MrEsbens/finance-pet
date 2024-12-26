@@ -12,13 +12,12 @@ class m241219_115540_create_transactions_table extends Migration
      */
     public function safeUp()
     {
-        $this->execute("CREATE TYPE transaction_type AS ENUM ('income', 'expense')");
+
         $this->createTable('transactions', [
             'id' => $this->primaryKey(),
             'sheet_id' => $this->integer()->notNull(),
             'category_id' => $this->integer()->notNull(),
             'amount' => $this->decimal()->notNull(),
-            'type' => "transaction_type NOT NULL",
             'transaction_date' => $this->date()->notNull(),
             'description' => $this->text()->notNull(),
             'created_at' => $this->dateTime()->notNull(),

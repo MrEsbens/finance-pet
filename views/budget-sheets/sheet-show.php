@@ -51,9 +51,7 @@ for ($day = 1; $day <= $daysInMonth; $day++) {
 <div class="container mt-5">
     <h1 class="text-center"><?= Html::encode($this->title) ?></h1>
     <div class="d-flex justify-content-start mb-4">
-        <?= Html::a('Категории', ['category/index'], ['class' => 'btn btn-outline-info me-2']) ?>
-        <?= Html::a('Добавить категорию расхода', ['category/create-expense'], ['class' => 'btn btn-outline-info me-2']) ?>
-        <?= Html::a('Добавить категорию дохода', ['category/create-income'], ['class' => 'btn btn-outline-info me-2']) ?>
+        <?= Html::a('Категории', ['categories/show'], ['class' => 'btn btn-outline-info me-2']) ?>
     </div>
 
     <div class="d-flex justify-content-between mb-4">

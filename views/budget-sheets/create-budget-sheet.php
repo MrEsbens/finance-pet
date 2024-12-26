@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <?php $form = ActiveForm::begin(); ?>
 
-            <?= $form->field($budget_sheet, 'name')->textInput(['autofocus' => true]) ?>
+            <?= $form->field($budget_sheet, 'name')->label("Название бюджетного листа")->textInput(['autofocus' => true]) ?>
             <?php
                 if ($action === 'update') {
                     echo Html::activeHiddenInput($budget_sheet, 'id', ['value' => Yii::$app->request->get('id')]);

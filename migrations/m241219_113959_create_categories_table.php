@@ -12,10 +12,12 @@ class m241219_113959_create_categories_table extends Migration
      */
     public function safeUp()
     {
+        $this->execute("CREATE TYPE category_type AS ENUM ('income', 'expense')");
         $this->createTable('categories', [
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
             'name' => $this->string()->notNull()->unique(),
+            'type' => "category_type NOT NULL",
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
         ]);
