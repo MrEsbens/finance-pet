@@ -19,7 +19,7 @@ class BudgetSheetsController extends Controller{
         return $this->render('budget-sheets', ['budget_sheets'=>$budget_sheets]);
     }
     public function actionCreate(){
-        $model = new createBudgetSheet();
+        $model = new CreateBudgetSheet();
         if($model->load(Yii::$app->request->post()) && $model->validate()){
             $budget_sheet = new BudgetSheet();
             $budget_sheet->user_id = Yii::$app->user->id;
@@ -33,7 +33,7 @@ class BudgetSheetsController extends Controller{
         return $this->render('create-budget-sheet', ['budget_sheet' => $model, 'action'=>'create']);
     }
     public function actionUpdate(){
-        $model = new createBudgetSheet();
+        $model = new CreateBudgetSheet();
         if($model->load(Yii::$app->request->post()) && $model->validate()){
             $budget_sheet = BudgetSheet::findOne(Yii::$app->request->post('CreateBudgetSheet')['id']);
             if($budget_sheet) {

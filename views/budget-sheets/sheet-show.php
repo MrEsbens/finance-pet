@@ -66,7 +66,7 @@ for ($day = 1; $day <= $daysInMonth; $day++) {
             // Отображаем дни текущего месяца
             for ($day = 1; $day <= $daysInMonth; $day++): ?>
                 <div class="col-md-2 text-center border p-3">
-                    <h5><?= $day ?></h5>
+                    <?=Html::a($day, Url::to(['transaction/show', 'day' => $day, 'month' => $currentMonth, 'year' => $currentYear, 'sheet_id' => $budget_sheet->id]), ['class' => 'h5']) ?>
                     <p>Расходы: <?= Html::encode($expenses[$day]) ?> руб.</p>
                     <p>Доходы: <?= Html::encode($incomes[$day]) ?> руб.</p>
                 </div>

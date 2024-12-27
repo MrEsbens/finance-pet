@@ -19,7 +19,7 @@ class m241219_115540_create_transactions_table extends Migration
             'category_id' => $this->integer()->notNull(),
             'amount' => $this->decimal()->notNull(),
             'transaction_date' => $this->date()->notNull(),
-            'description' => $this->text()->notNull(),
+            'description' => $this->text(),
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime()->notNull(),
         ]);
