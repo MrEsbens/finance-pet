@@ -16,7 +16,7 @@ class TransactionController extends Controller{
         }else{
             $date = Yii::$app->request->get('date');
         }
-        $query = Transaction::find()->where(['transaction_date' => $date])->all();
+        $query = Transaction::find()->where(['transaction_date' => $date, 'sheet_id' => Yii::$app->request->get('sheet_id')])->all();
         if($query){
             foreach($query as $item){
                 $transaction[$item->id]['data'] = $item;
@@ -42,7 +42,7 @@ class TransactionController extends Controller{
             $transaction->created_at = date('Y-m-d H:i:s', time());
             $transaction->updated_at = date('Y-m-d H:i:s', time());
             if($transaction->save()){
-                return $this->redirect(['transaction/show', 'date' =>  Yii::$app->request->get('date')]);
+                return $this->redirect(['transaction/show', 'date' =>  Yii::$app->request->get('date'), 'sheet_id' => Yii::$app->request->get('sheet_id')]);
             }else {
                 throw new NotFoundHttpException('Запись не найдена');
             }
@@ -68,7 +68,7 @@ class TransactionController extends Controller{
             $transaction->description = $model->description;
             $transaction->updated_at = date('Y-m-d H:i:s', time());
             if($transaction->save()){
-                return $this->redirect(['transaction/show', 'date' => $date]);
+                return $this->redirect(['transaction/show', 'date' => $date, 'sheet_id' => Yii::$app->request->get('sheet_id')]);
             }else {
                 throw new NotFoundHttpException('Запись не найдена');
             }

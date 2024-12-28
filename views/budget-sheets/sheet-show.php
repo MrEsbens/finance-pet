@@ -3,15 +3,15 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 /** @var $budget_sheet */
+/** @var $currentMonth */
+/** @var $currentYear */
+/** @var $daysInMonth */
+/** @var $expenses */
+/** @var $incomes */
 
 $this->title = $budget_sheet->name;
 $this->params['breadcrumbs'][] = $this->title;
 
-// Получаем текущий месяц и год
-$currentMonth = isset($_GET['month']) ? (int)$_GET['month'] : date('m');
-$currentYear = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
-
-// Определяем предыдущий и следующий месяц
 $prevMonth = $currentMonth == 1 ? 12 : $currentMonth - 1;
 $prevYear = $currentMonth == 1 ? $currentYear - 1 : $currentYear;
 
@@ -34,18 +34,7 @@ $monthsRu = [
     '12' => 'Декабрь',
 ];
 
-// Массив для хранения расходов и доходов по дням
-$expenses = []; // Здесь должны быть ваши данные о расходах
-$incomes = [];  // Здесь должны быть ваши данные о доходах
-
 // Получаем количество дней в текущем месяце
-$daysInMonth = date('t', mktime(0, 0, 0, $currentMonth, 1, $currentYear));
-
-// Пример данных (замените на ваши реальные данные)
-for ($day = 1; $day <= $daysInMonth; $day++) {
-    $expenses[$day] = rand(0, 100); // Случайные расходы для примера
-    $incomes[$day] = rand(0, 100);   // Случайные доходы для примера
-}
 ?>
 
 <div class="container mt-5">
@@ -55,7 +44,7 @@ for ($day = 1; $day <= $daysInMonth; $day++) {
     </div>
 
     <div class="d-flex justify-content-between mb-4">
-        <?= Html::a('Предыдущий месяц', ['id' => $budget_sheet->id,'budget-sheets/show', 'month' => sprintf('%02d', $prevMonth), 'year' => $prevYear], ['class' => 'btn btn-secondary']) ?>
+        <?= Html::a('Предыдущий месяц', ['id' => $budget_sheet->id, 'budget-sheets/show', 'month' => sprintf('%02d', $prevMonth), 'year' => $prevYear], ['class' => 'btn btn-secondary']) ?>
         <h2 class="text-center"><?= Html::encode($monthsRu[sprintf('%02d', $currentMonth)]) . " " . $currentYear ?></h2>
         <?= Html::a('Следующий месяц', ['id' => $budget_sheet->id, 'budget-sheets/show', 'month' => sprintf('%02d', $nextMonth), 'year' => $nextYear], ['class' => 'btn btn-secondary']) ?>
     </div>
@@ -63,14 +52,41 @@ for ($day = 1; $day <= $daysInMonth; $day++) {
     <div class="calendar">
         <div class="row">
             <?php
+            // Инициализация переменных для подсчета общих доходов и расходов
+            $totalIncome = 0;
+            $totalExpense = 0;
+
             // Отображаем дни текущего месяца
-            for ($day = 1; $day <= $daysInMonth; $day++): ?>
+            for ($day = 1; $day <= $daysInMonth; $day++):
+                // Суммируем доходы и расходы
+                if (isset($expenses[$day])) {
+                    $totalExpense += (float)$expenses[$day];
+                }
+                if (isset($incomes[$day])) {
+                    $totalIncome += (float)$incomes[$day];
+                }
+                ?>
                 <div class="col-md-2 text-center border p-3">
-                    <?=Html::a($day, Url::to(['transaction/show', 'day' => $day, 'month' => $currentMonth, 'year' => $currentYear, 'sheet_id' => $budget_sheet->id]), ['class' => 'h5']) ?>
-                    <p>Расходы: <?= Html::encode($expenses[$day]) ?> руб.</p>
-                    <p>Доходы: <?= Html::encode($incomes[$day]) ?> руб.</p>
+                    <?= Html::a($day, Url::to(['transaction/show',
+                        'day' => $day,
+                        'month' => $currentMonth,
+                        'year' => $currentYear,
+                        'sheet_id' => $budget_sheet->id]),
+                        ['class' => 'h5']) ?>
+                    <p>Расходы: <?= Html::encode(isset($expenses[$day]) ? number_format($expenses[$day], 2, ',', ' ') : 0) ?> руб.</p>
+                    <p>Доходы: <?= Html::encode(isset($incomes[$day]) ? number_format($incomes[$day], 2, ',', ' ') : 0) ?> руб.</p>
                 </div>
             <?php endfor; ?>
+        </div>
+    </div>
+
+    <!-- Вывод итоговых сумм -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <h4>Итоговые суммы за месяц</h4>
+            <p><strong>Общий доход:</strong> <?= number_format($totalIncome, 2, ',', ' ') ?> руб.</p>
+            <p><strong>Общий расход:</strong> <?= number_format($totalExpense, 2, ',', ' ') ?> руб.</p>
+            <p><strong>Итоговый баланс:</strong> <?= number_format($totalIncome - $totalExpense, 2, ',', ' ') ?> руб.</p>
         </div>
     </div>
 </div>

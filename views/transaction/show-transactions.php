@@ -77,6 +77,30 @@ $this->params['breadcrumbs'][] = $this->title;
             'emptyText' => '<div class="alert alert-info text-center">Нет транзакций за этот день.</div>',
         ]); ?>
     </div>
+
+<?php
+// Инициализация переменных для сумм
+$totalIncome = 0;
+$totalExpense = 0;
+
+// Проход по транзакциям для подсчета итогов
+foreach ($transactions as $transaction) {
+    if ($transaction['category']['type'] === CategoryType::Income->value) {
+        $totalIncome += (float)$transaction['data']['amount'];
+    } elseif ($transaction['category']['type'] === CategoryType::Expense->value) {
+        $totalExpense += (float)$transaction['data']['amount'];
+    }
+}
+?>
+
+    <div class="row mt-4">
+        <div class="col-lg-5 offset-lg-7">
+            <h4>Итоговые суммы</h4>
+            <p><strong>Общий доход:</strong> <?= number_format($totalIncome, 2, ',', ' ') ?> руб.</p>
+            <p><strong>Общий расход:</strong> <?= number_format($totalExpense, 2, ',', ' ') ?> руб.</p>
+            <p><strong>Остаток:</strong> <?= number_format($totalIncome - $totalExpense, 2, ',', ' ') ?> руб.</p>
+        </div>
+    </div>
 </div>
 
 <style>
