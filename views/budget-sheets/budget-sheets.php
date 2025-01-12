@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div>
             </div>
-            <hr> <!-- Разделительная линия -->
+            <hr>
         <?php endforeach; ?>
     </div>
     <div class="text-center mt-4">

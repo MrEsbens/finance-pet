@@ -1,10 +1,7 @@
 <?php
-
 /** @var string $action */
 /** @var string $type */
-
 /** @var $category */
-
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;

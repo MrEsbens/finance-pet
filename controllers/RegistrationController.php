@@ -23,8 +23,6 @@ class RegistrationController extends Controller{
                 Yii::$app->user->login($user);
                 return $this->goHome();
             }
-        } else {
-            var_dump($model->getErrors()); // Вывод ошибок при сохранении
         }
         return $this->render('registration', ['model' => $model]);
     }

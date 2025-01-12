@@ -10,7 +10,6 @@ $this->title = 'Мои категории';
 $this->params['breadcrumbs'][] = $this->title;
 $income =[];
 $expense =[];
-
 foreach ($categories as $category) {
     if ($category['type'] == CategoryType::Income->value) {
         $income[] = $category;
@@ -19,6 +18,7 @@ foreach ($categories as $category) {
     }
 }
 ?>
+
 <div class="container mt-5">
     <div class="row">
         <h2>Категории доходов</h2>
@@ -34,7 +34,7 @@ foreach ($categories as $category) {
                     </div>
                 </div>
             </div>
-            <hr> <!-- Разделительная линия -->
+            <hr>
         <?php endforeach; ?>
     </div>
     <div class="text-center mt-4">
@@ -54,7 +54,7 @@ foreach ($categories as $category) {
                     </div>
                 </div>
             </div>
-            <hr> <!-- Разделительная линия -->
+            <hr>
         <?php endforeach; ?>
     </div>
     <div class="text-center mt-4">

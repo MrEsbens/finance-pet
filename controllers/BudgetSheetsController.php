@@ -29,7 +29,7 @@ class BudgetSheetsController extends Controller{
             $budget_sheet->created_at = date('Y-m-d H:i:s', time());
             $budget_sheet->updated_at = date('Y-m-d H:i:s', time());
             if($budget_sheet->save()){
-             $this->redirect(['budget-sheets/index']);
+                $this->redirect(['budget-sheets/index']);
             }
         }
         return $this->render('create-budget-sheet', ['budget_sheet' => $model, 'action'=>'create']);
@@ -66,8 +66,8 @@ class BudgetSheetsController extends Controller{
         $currentMonth = isset($_GET['month']) ? (int)$_GET['month'] : date('m');
         $currentYear = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
         $daysInMonth = date('t', mktime(0, 0, 0, $currentMonth, 1, $currentYear));
-        $expenses = []; // Здесь должны быть ваши данные о расходах
-        $incomes = [];  // Здесь должны быть ваши данные о доходах
+        $expenses = [];
+        $incomes = [];
         $query = Transaction::find()
             ->where(['>=', 'transaction_date', $currentYear.'-'.$currentMonth.'-01'])
             ->andWhere(['<=', 'transaction_date', $currentYear.'-'.$currentMonth.'-'.$daysInMonth])

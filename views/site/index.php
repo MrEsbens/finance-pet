@@ -1,13 +1,12 @@
 <?php
 
-/** @var yii\web\View $this */
+/** @var yii\web\View */
 
 $this->title = 'BudgetGuru';
 ?>
 <div class="body-container text-center">
     <div class="main-title">Добро пожаловать в BudgetGuru!</div>
     <p class="lead">Ваш надежный помощник в управлении личными финансами.</p>
-
     <div class="features">
         <div class="feature-item">
             <h2>Простой интерфейс</h2>
