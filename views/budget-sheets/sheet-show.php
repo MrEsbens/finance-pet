@@ -33,10 +33,10 @@ $monthsRu = [
 <div class="container mt-5">
     <h1 class="text-center"><?= Html::encode($this->title) ?></h1>
     <div class="d-flex justify-content-start mb-4">
-        <?= Html::a('Категории', ['categories/show'], ['class' => 'btn btn-outline-info me-2']) ?>
+        <?= Html::a('Категории', ['categories/show', 'sheet_id' => $budget_sheet->id], ['class' => 'btn btn-outline-info me-2']) ?>
     </div>
     <div class="d-flex justify-content-start mb-4">
-        <?= Html::a('Добавить периодические траты', ['categories/periods'], ['class' => 'btn btn-outline-info me-2']) ?>
+        <?= Html::a('Добавить периодические траты', ['transaction/create-recurring-expense', 'sheet_id' => $budget_sheet->id], ['class' => 'btn btn-outline-info me-2']) ?>
     </div>
     <div class="d-flex justify-content-between mb-4">
         <?= Html::a('Предыдущий месяц', ['id' => $budget_sheet->id, 'budget-sheets/show', 'month' => sprintf('%02d', $prevMonth), 'year' => $prevYear], ['class' => 'btn btn-secondary']) ?>

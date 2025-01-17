@@ -3,11 +3,16 @@
 namespace app\controllers;
 
 use app\models\Category;
+use app\models\enums\RecurringExpencePeriod;
 use Yii;
 use yii\web\Controller;
 use app\models\Transaction;
 use app\models\CreateTransaction;
+use app\models\CreateRecurringExpenseForm;
+use DateInterval;
+use DateTime;
 use yii\web\NotFoundHttpException;
+use yii\db\Exception;
 
 class TransactionController extends Controller{
     public function actionShow(){
@@ -83,4 +88,70 @@ class TransactionController extends Controller{
             throw new NotFoundHttpException('Запись не найдена');
         }
     }
+    public function actionCreateRecurringExpense() {
+        $model = new CreateRecurringExpenseForm();
+        $categories = Category::findAll(['user_id' => Yii::$app->user->id]);
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $date = strtotime($model->transaction_date);
+                $record = new Transaction();
+                $record->sheet_id = $model->sheet_id;
+                $record->category_id = $model->category_id;
+                $record->amount = floatval($model->amount);
+                $record->transaction_date = date('Y-m-d H:i:s', $date);
+                $record->description = $model->description;
+                $record->created_at = date('Y-m-d H:i:s');
+                $record->updated_at = date('Y-m-d H:i:s');
+
+                if (!$record->save()) {
+                    throw new Exception('Не удалось сохранить первую транзакцию: ' . json_encode($record->errors));
+                }
+
+                for ($i = 1; $i < intval($model->quantity); $i++) {
+                    $newRecord = new Transaction();
+                    $newRecord->sheet_id = $model->sheet_id;
+                    $newRecord->category_id = $model->category_id;
+                    $newRecord->amount = floatval($model->amount);
+
+                    switch ($model->period) {
+                        case RecurringExpencePeriod::DAILY->value:
+                            $newRecord->transaction_date = date('Y-m-d H:i:s', strtotime($record->transaction_date . "+$i days"));
+                            break;
+                        case RecurringExpencePeriod::WEEKLY->value:
+                            $newRecord->transaction_date = date('Y-m-d H:i:s', strtotime($record->transaction_date . "+" . $i*6 . " days"));
+                            break;
+                        case RecurringExpencePeriod::MONTHLY->value:
+                            $newRecord->transaction_date = date('Y-m-d H:i:s', strtotime($record->transaction_date . "+$i months"));
+                            break;
+                        case RecurringExpencePeriod::YEARLY->value:
+                            $newRecord->transaction_date = date('Y-m-d H:i:s', strtotime($record->transaction_date . "+$i years"));
+                            break;
+                    }
+
+                    $newRecord->description = $model->description;
+                    $newRecord->created_at = date('Y-m-d H:i:s');
+                    $newRecord->updated_at = date('Y-m-d H:i:s');
+
+                    if (!$newRecord->save()) {
+                        throw new Exception('Ошибка при сохранении повторяющейся транзакции: ' . json_encode($newRecord->errors));
+                    }
+                }
+
+                $transaction->commit();
+            } catch (Exception $e) {
+                $transaction->rollBack();
+                return "Transaction ended with error and has been rollbacked. Message: " . $e->getMessage();
+            }
+
+            return $this->redirect(['budget-sheets/show', 'id' => $model->sheet_id]);
+        }
+
+        return $this->render('create-recurring-expense', [
+            'model' => $model,
+            'categories' => $categories,
+            'sheet_id' => Yii::$app->request->get('sheet_id')
+        ]);
+    }    
 }
