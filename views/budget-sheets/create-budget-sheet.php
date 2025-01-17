@@ -10,9 +10,10 @@ use yii\bootstrap5\Html;
 
 if($action === 'create') {
     $this->title = 'Создать бюджетный лист';
-}else if ($action === 'update'){
+} else if($action === 'update') {
     $this->title = 'Переименовать бюджетный лист';
 }
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
@@ -23,6 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php $form = ActiveForm::begin(); ?>
 
             <?= $form->field($budget_sheet, 'name')->label("Название бюджетного листа")->textInput(['autofocus' => true]) ?>
+
             <?php
                 if ($action === 'update') {
                     echo Html::activeHiddenInput($budget_sheet, 'id', ['value' => Yii::$app->request->get('id')]);
@@ -31,13 +33,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="form-group">
                 <div>
-                    <?php
-                    if ($action === 'create') {
+                    <?php if($action === 'create') {
                         echo Html::submitButton('Создать лист', ['class' => 'btn btn-primary']);
-                    }else if ($action === 'update'){
+                    } else if($action === 'update') {
                         echo Html::submitButton('Переименовать лист', ['class' => 'btn btn-primary']);
-                    }
-                    ?>
+                    }?>
                 </div>
             </div>
             <?php ActiveForm::end(); ?>

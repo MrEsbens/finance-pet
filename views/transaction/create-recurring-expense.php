@@ -15,16 +15,16 @@ $categories_rus = [
     'expense' => 'Расход'
 ];
 
-foreach ($category_types_enum as $category_type) {
+foreach($category_types_enum as $category_type) {
     $category_types[$category_type->value] = $categories_rus[$category_type->value];
 }
 
 $incomes = [];
 $expenses = [];
-foreach ($categories as $category) {
-    if ($category['type'] == CategoryType::Income->value) {
+foreach($categories as $category) {
+    if($category['type'] == CategoryType::Income->value) {
         $incomes[$category['id']] = $category['name'];
-    } else if ($category['type'] == CategoryType::Expense->value) {
+    } else if($category['type'] == CategoryType::Expense->value) {
         $expenses[$category['id']] = $category['name'];
     }
 }
@@ -41,7 +41,7 @@ $period_rus = [
     'yearly' => 'Ежегодно'
 ];
 
-foreach ($period_types_enum as $period_type) {
+foreach($period_types_enum as $period_type) {
     $period_types[$period_type->value] = $period_rus[$period_type->value];
 }
 
@@ -49,27 +49,27 @@ $this->title = 'Создать периодическую транзакцию';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="create-model">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($this->title)?></h1>
     <div class="row">
         <div class="col-lg-5">
 
-            <?php $form = ActiveForm::begin(); ?>
+            <?php $form = ActiveForm::begin();?>
 
-            <?= $form->field($model, 'amount')->label("Сумма")->textInput(['type' => 'number', 'step' => '0.01']); ?>
-            <?= $form->field($model, 'description')->label('Дополнительное описание')->textInput(); ?>
-            <?= $form->field($model, 'transaction_date')->label('Дата первой транзакции')->input('date'); ?> 
-            <?= $form->field($model, 'category_id')->label('Тип')->dropDownList($category_types, ['prompt' => 'Выберите тип транзакции', 'id' => 'category-type-dropdown']); ?>
-            <?= $form->field($model, 'category_id')->label('Категория')->dropDownList([], ['prompt' => 'Выберите категорию', 'id' => 'dynamic-category-dropdown']); ?>
-            <?= $form->field($model, 'period')->label('Период')->dropDownList($period_types, ['prompt' => 'Выберите период']); ?>
-            <?= $form->field($model, 'quantity')->label('Количество транзакций')->textInput(['type' => 'number', 'min' => 0]); ?>
-            <?= Html::activeHiddenInput($model, 'sheet_id', ['value' => $sheet_id]); ?>
+            <?= $form->field($model, 'amount')->label("Сумма")->textInput(['type' => 'number', 'step' => '0.01']);?>
+            <?= $form->field($model, 'description')->label('Дополнительное описание')->textInput();?>
+            <?= $form->field($model, 'transaction_date')->label('Дата первой транзакции')->input('date');?> 
+            <?= $form->field($model, 'category_id')->label('Тип')->dropDownList($category_types, ['prompt' => 'Выберите тип транзакции', 'id' => 'category-type-dropdown']);?>
+            <?= $form->field($model, 'category_id')->label('Категория')->dropDownList([], ['prompt' => 'Выберите категорию', 'id' => 'dynamic-category-dropdown']);?>
+            <?= $form->field($model, 'period')->label('Период')->dropDownList($period_types, ['prompt' => 'Выберите период']);?>
+            <?= $form->field($model, 'quantity')->label('Количество транзакций')->textInput(['type' => 'number', 'min' => 0]);?>
+            <?= Html::activeHiddenInput($model, 'sheet_id', ['value' => $sheet_id]);?>
 
             <div class="form-group">
                 <div>
-                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']); ?>
+                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']);?>
                 </div>
             </div>
-            <?php ActiveForm::end(); ?>
+            <?php ActiveForm::end();?>
         </div>
     </div>
 </div>

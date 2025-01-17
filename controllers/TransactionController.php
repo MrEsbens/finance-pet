@@ -14,30 +14,37 @@ use DateTime;
 use yii\web\NotFoundHttpException;
 use yii\db\Exception;
 
-class TransactionController extends Controller{
-    public function actionShow(){
-        if(empty(Yii::$app->request->get('date'))){
+class TransactionController extends Controller
+{
+    public function actionShow()
+    {
+        if(empty(Yii::$app->request->get('date'))) {
             $date = sprintf('%04d-%02d-%02d', Yii::$app->request->get('year'), Yii::$app->request->get('month'), Yii::$app->request->get('day'));
-        }else{
+        } else {
             $date = Yii::$app->request->get('date');
         }
+
         $query = Transaction::find()->where(['transaction_date' => $date, 'sheet_id' => Yii::$app->request->get('sheet_id')])->all();
-        if($query){
+        if($query) {
             foreach($query as $item){
                 $transaction[$item->id]['data'] = $item;
                 $transaction[$item->id]['category'] = Category::findOne($item->category_id);
             }
-        }else $transaction = [];
+        } else {
+            $transaction = [];
+        }
+
         return $this->render('show-transactions', [
             'sheet_id' => Yii::$app->request->get('sheet_id'),
             'date' => $date,
             'transactions' => $transaction
         ]);
     }
-    public function actionCreate(){
+    public function actionCreate()
+    {
         $model = new CreateTransaction();
         $categories = Category::findAll(['user_id' => Yii::$app->user->id]);
-        if($model->load(Yii::$app->request->post()) && $model->validate()){
+        if($model->load(Yii::$app->request->post()) && $model->validate()) {
             $transaction = new Transaction();
             $transaction->sheet_id = $model->sheet_id;
             $transaction->category_id = $model->category_id;
@@ -46,13 +53,20 @@ class TransactionController extends Controller{
             $transaction->description = $model->description;
             $transaction->created_at = date('Y-m-d H:i:s', time());
             $transaction->updated_at = date('Y-m-d H:i:s', time());
-            if($transaction->save()){
+
+            if($transaction->save()) {
                 return $this->redirect(['transaction/show', 'date' =>  Yii::$app->request->get('date'), 'sheet_id' => Yii::$app->request->get('sheet_id')]);
-            }else {
+            } else {
                 throw new NotFoundHttpException('Запись не найдена');
             }
         }
-        return $this->render('create-transaction', ['transaction' => $model, 'action' => 'create', 'date' =>  Yii::$app->request->get('date'), 'sheet_id' => Yii::$app->request->get('sheet_id'), 'categories' => $categories]);
+
+        return $this->render('create-transaction', 
+            ['transaction' => $model, 
+            'action' => 'create', 
+            'date' =>  Yii::$app->request->get('date'), 
+            'sheet_id' => Yii::$app->request->get('sheet_id'), 
+            'categories' => $categories]);
     }
     public function actionUpdate()
     {
@@ -65,35 +79,41 @@ class TransactionController extends Controller{
         $model->description = $transaction->description;
         $categories = Category::findAll(['user_id' => Yii::$app->user->id]);
         $date = Yii::$app->request->get('date');
-        if($model->load(Yii::$app->request->post()) && $model->validate()){
+
+        if($model->load(Yii::$app->request->post()) && $model->validate()) {
             $transaction->sheet_id = $model->sheet_id;
             $transaction->category_id = $model->category_id;
             $transaction->amount = floatval($model->amount);
             $transaction->transaction_date = $model->transaction_date;
             $transaction->description = $model->description;
             $transaction->updated_at = date('Y-m-d H:i:s', time());
-            if($transaction->save()){
+
+            if($transaction->save()) {
                 return $this->redirect(['transaction/show', 'date' => $date, 'sheet_id' => Yii::$app->request->get('sheet_id')]);
-            }else {
+            } else {
                 throw new NotFoundHttpException('Запись не найдена');
             }
         }
+
         return  $this->render('create-transaction', ['transaction' => $model, 'action' => 'update', 'date' => $date, 'sheet_id' => $model->sheet_id, 'categories' => $categories]);
     }
-    public function actionDelete(){
+    public function actionDelete()
+    {
         $transaction = Transaction::findOne(Yii::$app->request->get('id'));
-        if($transaction->delete()){
+        if($transaction->delete()) {
             return $this->redirect(['transaction/show', 'date'=>Yii::$app->request->get('date') ]);
-        }else {
+        } else {
             throw new NotFoundHttpException('Запись не найдена');
         }
     }
-    public function actionCreateRecurringExpense() {
+    public function actionCreateRecurringExpense() 
+    {
         $model = new CreateRecurringExpenseForm();
         $categories = Category::findAll(['user_id' => Yii::$app->user->id]);
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $transaction = Yii::$app->db->beginTransaction();
+
             try {
                 $date = strtotime($model->transaction_date);
                 $record = new Transaction();
@@ -138,7 +158,6 @@ class TransactionController extends Controller{
                         throw new Exception('Ошибка при сохранении повторяющейся транзакции: ' . json_encode($newRecord->errors));
                     }
                 }
-
                 $transaction->commit();
             } catch (Exception $e) {
                 $transaction->rollBack();
@@ -148,10 +167,10 @@ class TransactionController extends Controller{
             return $this->redirect(['budget-sheets/show', 'id' => $model->sheet_id]);
         }
 
-        return $this->render('create-recurring-expense', [
-            'model' => $model,
+        return $this->render('create-recurring-expense', 
+            ['model' => $model,
             'categories' => $categories,
             'sheet_id' => Yii::$app->request->get('sheet_id')
-        ]);
+            ]);
     }    
 }

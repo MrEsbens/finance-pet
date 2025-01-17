@@ -17,27 +17,26 @@ $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, 
 $this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
 $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
-?>
-<?php $this->beginPage() ?>
+$this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
     <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+    <?php $this->head()?>
 </head>
 <body class="d-flex flex-column h-100">
-<?php $this->beginBody() ?>
+
+<?php $this->beginBody()?>
 
 <header id="header">
-    <?php
-    NavBar::begin([
+    <?php NavBar::begin([
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark ']
     ]);
     $menuItemsLeft = [];
     $menuItemsRight = [];
-    if (Yii::$app->user->isGuest) {
+    if(Yii::$app->user->isGuest) {
         $menuItemsRight[] = ['label' => 'Вход', 'url' => ['/login']];
     } else {
         $menuItemsLeft[] = [
@@ -65,10 +64,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
 <main id="main" class="mt-auto flex-shrink-0" role="main">
     <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
+        <?php if (!empty($this->params['breadcrumbs'])):?>
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
-        <?= $content ?>
+        <?php endif?>
+        <?= $content?>
     </div>
 </main>
 
@@ -80,7 +79,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     </div>
 </footer>
 
-<?php $this->endBody() ?>
+<?php $this->endBody()?>
 </body>
 </html>
-<?php $this->endPage() ?>
+<?php $this->endPage()?>

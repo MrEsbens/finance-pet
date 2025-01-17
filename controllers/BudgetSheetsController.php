@@ -8,60 +8,74 @@ use app\models\BudgetSheet;
 use app\models\CreateBudgetSheet;
 use Yii;
 use yii\web\NotFoundHttpException;
+use yii\db\Exception;
 use app\models\Transaction;
 
-class BudgetSheetsController extends Controller{
-    public function actionIndex(){
-        if(Yii::$app->user->isGuest){
+class BudgetSheetsController extends Controller
+{
+    public function actionIndex()
+    {
+        if(Yii::$app->user->isGuest) {
             return $this->goHome();
         }
+
         $budget_sheets = BudgetSheet::findAll([
             'user_id' => Yii::$app->user->id,
         ]);
+
         return $this->render('budget-sheets', ['budget_sheets'=>$budget_sheets]);
     }
-    public function actionCreate(){
+    public function actionCreate()
+    {
         $model = new CreateBudgetSheet();
-        if($model->load(Yii::$app->request->post()) && $model->validate()){
+
+        if($model->load(Yii::$app->request->post()) && $model->validate()) {
             $budget_sheet = new BudgetSheet();
             $budget_sheet->user_id = Yii::$app->user->id;
             $budget_sheet->name = $model->name;
             $budget_sheet->created_at = date('Y-m-d H:i:s', time());
             $budget_sheet->updated_at = date('Y-m-d H:i:s', time());
-            if($budget_sheet->save()){
+            if($budget_sheet->save()) {
                 $this->redirect(['budget-sheets/index']);
             }
         }
+
         return $this->render('create-budget-sheet', ['budget_sheet' => $model, 'action'=>'create']);
     }
-    public function actionUpdate(){
+    public function actionUpdate()
+    {
         $model = new CreateBudgetSheet();
-        if($model->load(Yii::$app->request->post()) && $model->validate()){
+        if($model->load(Yii::$app->request->post()) && $model->validate()) {
             $budget_sheet = BudgetSheet::findOne(Yii::$app->request->post('CreateBudgetSheet')['id']);
             if($budget_sheet) {
                 $budget_sheet->name = $model->name;
                 $budget_sheet->updated_at = date('Y-m-d H:i:s', time());
 
-                if($budget_sheet->save()){
+                if($budget_sheet->save()) {
                     $this->redirect(['budget-sheets/index']);
-                }
-            }else{
+                } else {
+                    throw new Exception('Failed to save.');
+                } 
+            } else {
                 throw new NotFoundHttpException('Budget sheet not found.');
             }
         }
+
         return $this->render('create-budget-sheet', ['budget_sheet' => $model, 'action' => 'update']);
     }
-    public function actionDelete(){
+    public function actionDelete()
+    {
         $budget_sheet = BudgetSheet::findOne(Yii::$app->request->get('id'));
         if($budget_sheet) {
-            if($budget_sheet->delete()){
+            if($budget_sheet->delete()) {
                 $this->redirect(['budget-sheets/index']);
             }
-        }else{
+        } else {
             throw new NotFoundHttpException('Budget sheet not found.');
         }
     }
-    public function actionShow(){
+    public function actionShow()
+    {
         $budget_sheet = BudgetSheet::findOne(Yii::$app->request->get('id'));
         $currentMonth = isset($_GET['month']) ? (int)$_GET['month'] : date('m');
         $currentYear = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
@@ -73,18 +87,21 @@ class BudgetSheetsController extends Controller{
             ->andWhere(['<=', 'transaction_date', $currentYear.'-'.$currentMonth.'-'.$daysInMonth])
             ->andWhere(['sheet_id' => $budget_sheet->id])
             ->all();
+
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $incomes[$day] = 0;
             $expenses[$day] = 0;
         }
+
         foreach ($query as $res) {
             $category = Category::findOne($res->category_id);
             if ($category->type == CategoryType::Income->value) {
                 $incomes[date('j', strtotime($res->transaction_date))] += $res->amount;
-            }else{
+            } else {
                 $expenses[date('j', strtotime($res->transaction_date))] += $res->amount;
             }
         }
+
         return $this->render('sheet-show', ['budget_sheet'=>$budget_sheet,
             'currentMonth'=>$currentMonth,
             'currentYear'=>$currentYear,

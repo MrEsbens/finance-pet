@@ -49,10 +49,10 @@ $monthsRu = [
             $totalIncome = 0;
             $totalExpense = 0;
             for ($day = 1; $day <= $daysInMonth; $day++):
-                if (isset($expenses[$day])) {
+                if(isset($expenses[$day])) {
                     $totalExpense += (float)$expenses[$day];
                 }
-                if (isset($incomes[$day])) {
+                if(isset($incomes[$day])) {
                     $totalIncome += (float)$incomes[$day];
                 }
                 ?>

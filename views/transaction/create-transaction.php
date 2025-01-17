@@ -26,9 +26,9 @@ foreach($category_types_enum as $category_type) {
 $incomes = [];
 $expenses = [];
 foreach($categories as $category) {
-    if ($category['type'] == CategoryType::Income->value) {
+    if($category['type'] == CategoryType::Income->value) {
         $incomes[$category['id']] = $category['name'];
-    } else if ($category['type'] == CategoryType::Expense->value) {
+    } else if($category['type'] == CategoryType::Expense->value) {
         $expenses[$category['id']] = $category['name'];
     }
 }
@@ -38,23 +38,23 @@ $expensesJson = json_encode($expenses);
 
 if($action === 'create') {
     $this->title = 'Создать транзакцию';
-}else if ($action === 'update'){
+} else if($action === 'update') {
     $this->title = 'Изменить транзакцию';
 }
-$this->params['breadcrumbs'][] = $this->title;
-?>
+
+$this->params['breadcrumbs'][] = $this->title;?>
+
 <div class="create-transaction">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($this->title)?></h1>
 <div class="row">
     <div class="col-lg-5">
 
-        <?php $form = ActiveForm::begin(); ?>
+        <?php $form = ActiveForm::begin();?>
 
         <?=$form->field($transaction, 'amount')->label("Сумма")->textInput(['type' => 'number', 'step' => '0.01']);?>
         <?=$form->field($transaction, 'description')->label('Дополнительное описание')->textInput();?>
         <?=$form->field($transaction, 'category_id')->label('Тип')->dropDownList($category_types, ['prompt' => 'Выберите тип транзакции', 'id' => 'category-type-dropdown']);?>
-        <?=$form->field($transaction, 'category_id')->label('Категория')->dropDownList([], ['prompt' => 'Выберите категорию', 'id' => 'dynamic-category-dropdown']); ?>
-
+        <?=$form->field($transaction, 'category_id')->label('Категория')->dropDownList([], ['prompt' => 'Выберите категорию', 'id' => 'dynamic-category-dropdown']);?>
         <?=Html::activeHiddenInput($transaction, 'transaction_date', ['value' => $date]);?>
         <?=Html::activeHiddenInput($transaction, 'sheet_id', ['value' => $sheet_id]);?>
 
@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?=Html::submitButton('Сохранить', ['class' => 'btn btn-primary']);?>
             </div>
         </div>
-        <?php ActiveForm::end(); ?>
+        <?php ActiveForm::end();?>
     </div>
 </div>
 </div>

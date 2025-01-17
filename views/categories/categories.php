@@ -8,16 +8,16 @@ use app\models\enums\CategoryType;
 
 $this->title = 'Мои категории';
 $this->params['breadcrumbs'][] = $this->title;
+
 $income =[];
 $expense =[];
-foreach ($categories as $category) {
-    if ($category['type'] == CategoryType::Income->value) {
+foreach($categories as $category) {
+    if($category['type'] == CategoryType::Income->value) {
         $income[] = $category;
-    }else{
+    } else {
         $expense[] = $category;
     }
-}
-?>
+}?>
 
 <div class="container mt-5">
     <div class="row">

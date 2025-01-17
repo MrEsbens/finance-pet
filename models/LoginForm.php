@@ -11,14 +11,16 @@ use yii\base\Model;
  * @property-read User|null $user
  *
  */
-class LoginForm extends Model{
+class LoginForm extends Model
+{
     public $username;
     public $password;
     private $_user = null;
     /**
      * @return array the validation rules.
      */
-    public function rules(){
+    public function rules()
+    {
         return [
             [['username', 'password'], 'required'],
             ['password', 'validatePassword'],
@@ -60,6 +62,7 @@ class LoginForm extends Model{
         if ($this->_user === null) {
             $this->_user = User::findByUsername($this->username);
         }
+
         return $this->_user;
     }
 }

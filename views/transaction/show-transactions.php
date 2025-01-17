@@ -16,35 +16,35 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="container mt-5">
-    <h1 class="text-center"><?= Html::encode($this->title) ?></h1>
+    <h1 class="text-center"><?= Html::encode($this->title)?></h1>
 
     <div class="d-flex justify-content-end mb-4">
-        <?= Html::a('Добавить доход/расход', Url::to(['transaction/create', 'date' => $date, 'sheet_id' => $sheet_id]), ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Добавить доход/расход', Url::to(['transaction/create', 'date' => $date, 'sheet_id' => $sheet_id]), ['class' => 'btn btn-primary'])?>
     </div>
 
     <div class="table-responsive">
         <?= GridView::widget([
             'dataProvider' => new ArrayDataProvider([
                 'allModels' => $transactions,
-                'pagination' => false, // Отключаем пагинацию, так как это один день
+                'pagination' => false,
             ]),
             'columns' => [
                 [
                     'label' => 'Дата',
                     'value' => function($model) {
-                        return date('d-m-Y', strtotime($model['data']['transaction_date'])); // Замените 'date_column' на имя вашего столбца с датой
+                        return date('d-m-Y', strtotime($model['data']['transaction_date']));
                     },
                 ],
                 [
                     'label' => 'Сумма',
                     'value' => function($model) {
-                        return number_format($model['data']['amount'], 2, ',', ' ') . ' руб.'; // Замените 'amount' на имя вашего поля с суммой
+                        return number_format($model['data']['amount'], 2, ',', ' ') . ' руб.';
                     },
                 ],
                 [
                     'label' => 'Тип',
                     'value' => function($model) {
-                        return $model['category']['type'] === CategoryType::Income->value ? 'Доход' : 'Расход'; // Замените на вашу логику определения типа
+                        return $model['category']['type'] === CategoryType::Income->value ? 'Доход' : 'Расход';
                     },
                 ],
                 [
@@ -56,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'label' => 'Описание',
                     'value' => function($model) {
-                        return Html::encode($model['data']['description']); // Замените на имя вашего поля с описанием
+                        return Html::encode($model['data']['description']);
                     },
                 ],
                 [
@@ -73,25 +73,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]
             ],
             'showHeader' => true,
-            // Сообщение при отсутствии данных
+
             'emptyText' => '<div class="alert alert-info text-center">Нет транзакций за этот день.</div>',
-        ]); ?>
+        ]);?>
     </div>
 
 <?php
-// Инициализация переменных для сумм
 $totalIncome = 0;
 $totalExpense = 0;
 
-// Проход по транзакциям для подсчета итогов
-foreach ($transactions as $transaction) {
-    if ($transaction['category']['type'] === CategoryType::Income->value) {
+foreach($transactions as $transaction) {
+    if($transaction['category']['type'] === CategoryType::Income->value) {
         $totalIncome += (float)$transaction['data']['amount'];
-    } elseif ($transaction['category']['type'] === CategoryType::Expense->value) {
+    } else if($transaction['category']['type'] === CategoryType::Expense->value) {
         $totalExpense += (float)$transaction['data']['amount'];
     }
-}
-?>
+}?>
 
     <div class="row mt-4">
         <div class="col-lg-5 offset-lg-7">

@@ -6,7 +6,8 @@ use Yii;
 use yii\base\Model;
 use app\components\validators\PasswordValidator;
 
-class UserSettingsForm extends Model{
+class UserSettingsForm extends Model
+{
     public $username;
     public $email;
     public $change_password;
@@ -51,6 +52,7 @@ class UserSettingsForm extends Model{
                 $this->addError($attribute, 'Пароль введен неверно.');
             }
         }
+
         return false;
     }
 }
