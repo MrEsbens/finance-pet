@@ -8,6 +8,7 @@ services:
     container_name: yii-app
     volumes:
       - .:/var/www/html
+      - ./php/php.ini:/usr/local/etc/php/php.ini
     working_dir: /var/www/html
     depends_on:
       - db
