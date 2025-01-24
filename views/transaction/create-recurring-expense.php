@@ -46,7 +46,6 @@ foreach($period_types_enum as $period_type) {
 }
 
 $this->title = 'Создать периодическую транзакцию';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="create-model">
     <h1><?= Html::encode($this->title)?></h1>

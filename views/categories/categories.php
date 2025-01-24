@@ -7,7 +7,6 @@ use yii\helpers\Url;
 use app\models\enums\CategoryType;
 
 $this->title = 'Мои категории';
-$this->params['breadcrumbs'][] = $this->title;
 
 $income =[];
 $expense =[];

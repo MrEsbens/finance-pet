@@ -6,7 +6,6 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = 'Мои листы бюджета';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container mt-5">
     <div class="row">

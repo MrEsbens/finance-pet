@@ -64,9 +64,6 @@ $this->beginPage() ?>
 
 <main id="main" class="mt-auto flex-shrink-0" role="main">
     <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])):?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif?>
         <?= $content?>
     </div>
 </main>

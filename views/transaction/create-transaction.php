@@ -39,9 +39,7 @@ if($action === 'create') {
     $this->title = 'Создать транзакцию';
 } else if($action === 'update') {
     $this->title = 'Изменить транзакцию';
-}
-
-$this->params['breadcrumbs'][] = $this->title;?>
+}?>
 
 <div class="create-transaction">
     <h1><?= Html::encode($this->title)?></h1>

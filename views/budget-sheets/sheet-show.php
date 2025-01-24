@@ -10,7 +10,6 @@ use yii\helpers\Url;
 /** @var $incomes */
 
 $this->title = $budgetSheet->name;
-$this->params['breadcrumbs'][] = $this->title;
 $prevMonth = $currentMonth == 1 ? 12 : $currentMonth - 1;
 $prevYear = $currentMonth == 1 ? $currentYear - 1 : $currentYear;
 $nextMonth = $currentMonth == 12 ? 1 : $currentMonth + 1;

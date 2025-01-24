@@ -12,8 +12,6 @@ if($action === 'create') {
 } else if($action === 'update') {
     $this->title = 'Переименовать категорию';
 }
-
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-form">
     <h1><?= Html::encode($this->title) ?></h1>

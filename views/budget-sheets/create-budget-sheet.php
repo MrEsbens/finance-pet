@@ -13,8 +13,6 @@ if($action === 'create') {
 } else if($action === 'update') {
     $this->title = 'Переименовать бюджетный лист';
 }
-
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
     <h1><?= Html::encode($this->title) ?></h1>

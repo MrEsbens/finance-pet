@@ -3,7 +3,6 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 $this->title = 'Настройки пользователя';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="settings-index">

@@ -12,7 +12,6 @@ use app\models\enums\CategoryType;
 /* @var $sheetId */
 
 $this->title = "Транзакции за ".date('d-m-Y',strtotime($date));
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="container mt-5">
@@ -75,6 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'showHeader' => true,
 
             'emptyText' => '<div class="alert alert-info text-center">Нет транзакций за этот день.</div>',
+            'summary' => 'Всего транзакций за этот день: {totalCount}.',
         ]);?>
     </div>
 
