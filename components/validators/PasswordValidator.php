@@ -14,6 +14,11 @@ class PasswordValidator extends Validator
             return;
         }
 
+        if (!preg_match('/^[a-zA-Z]+$/', $password)) {
+            $this->addError($model, $attribute, 'Пароль должен состоять только из латинских символов.');
+            return;
+        }
+
         if (!preg_match('/[A-Z]/', $password)) {
             $this->addError($model, $attribute, 'Пароль должен содержать хотя бы одну заглавную букву.');
             return;

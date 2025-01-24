@@ -1,41 +1,44 @@
 <?php
 namespace app\controllers;
+
+use app\components\services\SettingsService;
+use app\components\services\UserService;
 use Yii;
 use yii\web\Controller;
-use app\models\User;
-use app\models\UserSettingsForm;
 use yii\db\Exception;
 
 class SettingsController extends Controller
 {
+    private UserService $userService;
+    private SettingsService $settingsService;
+
+    public function __construct(
+        string $id, 
+        $module, 
+        UserService $userService, 
+        SettingsService $settingsService,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+        $this->userService = $userService;
+        $this->settingsService = $settingsService;
+    }
     public function actionIndex()
     {
-        if(Yii::$app->user->isGuest) {
+        if($this->userService->isGuest()) { 
             return $this->goHome();
         }
 
-        $user = User::findOne(Yii::$app->user->getId());
-        $model = new UserSettingsForm();
-        $model->username = $user->username;
-        $model->email = $user->email;
-        $model->change_password = false;
+        $settingsForm = $this->settingsService->bindSettingsForm();
 
-        if($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $user->username = $model->username;
-            $user->email = $model->email;
-            $user->updated_at = date('Y-m-d H:i:s', time());
-
-            if ($model->change_password) {
-                $user->password_hash = Yii::$app->getSecurity()->generatePasswordHash($model->password);
-            }
-
-            if($user->update()) {
+        if ($settingsForm->load(Yii::$app->request->post()) && $settingsForm->validate()) {
+            if ($this->settingsService->updateSettings($settingsForm)) {
                 return $this->goHome();
             } else {
-                throw new Exception('Не удалось внести изменения');
+                throw new Exception('Failed to update user settings');
             }
         }
 
-        return $this->render('settings', ['model' => $model]);
+        return $this->render('settings', ['model' => $settingsForm]);
     }
 }

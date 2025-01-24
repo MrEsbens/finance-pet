@@ -2,175 +2,127 @@
 
 namespace app\controllers;
 
-use app\models\Category;
-use app\models\enums\RecurringExpencePeriod;
+use app\components\services\CategoriesService;
+use app\components\services\TransactionsService;
+use app\components\services\UserService;
 use Yii;
 use yii\web\Controller;
-use app\models\Transaction;
 use app\models\CreateTransaction;
-use app\models\CreateRecurringExpenseForm;
-use DateInterval;
-use DateTime;
+use app\models\CreateRecurringTransactionForm;
+use app\models\User;
 use yii\web\NotFoundHttpException;
-use yii\db\Exception;
 
 class TransactionController extends Controller
 {
+    private TransactionsService $transactionsService;
+    private CategoriesService $categoriesService;
+    private UserService $userService;
+
+    public function __construct(
+        string $id,
+        $module,
+        TransactionsService $transactionsService,
+        CategoriesService $categoriesService,
+        UserService $userService,
+        array $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+        $this->transactionsService = $transactionsService;
+        $this->categoriesService = $categoriesService;
+        $this->userService = $userService;
+    }
     public function actionShow()
     {
-        if(empty(Yii::$app->request->get('date'))) {
-            $date = sprintf('%04d-%02d-%02d', Yii::$app->request->get('year'), Yii::$app->request->get('month'), Yii::$app->request->get('day'));
-        } else {
-            $date = Yii::$app->request->get('date');
+        if($this->userService->isGuest()) {
+            return $this->goHome();
         }
 
-        $query = Transaction::find()->where(['transaction_date' => $date, 'sheet_id' => Yii::$app->request->get('sheet_id')])->all();
-        if($query) {
-            foreach($query as $item){
-                $transaction[$item->id]['data'] = $item;
-                $transaction[$item->id]['category'] = Category::findOne($item->category_id);
-            }
-        } else {
-            $transaction = [];
-        }
+        $sheetId = (int) Yii::$app->request->get('sheet_id');
+        $date = Yii::$app->request->get('date') ?: sprintf(
+            '%04d-%02d-%02d',
+            Yii::$app->request->get('year'),
+            Yii::$app->request->get('month'),
+            Yii::$app->request->get('day')
+        );
+
+        $transactions = $this->transactionsService->findByDate($sheetId, $date);
 
         return $this->render('show-transactions', [
-            'sheet_id' => Yii::$app->request->get('sheet_id'),
+            'sheetId' => $sheetId,
             'date' => $date,
-            'transactions' => $transaction
+            'transactions' => $transactions,
         ]);
     }
     public function actionCreate()
     {
-        $model = new CreateTransaction();
-        $categories = Category::findAll(['user_id' => Yii::$app->user->id]);
-        if($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $transaction = new Transaction();
-            $transaction->sheet_id = $model->sheet_id;
-            $transaction->category_id = $model->category_id;
-            $transaction->amount = floatval($model->amount);
-            $transaction->transaction_date = $model->transaction_date;
-            $transaction->description = $model->description;
-            $transaction->created_at = date('Y-m-d H:i:s', time());
-            $transaction->updated_at = date('Y-m-d H:i:s', time());
+        $transactionForm = new CreateTransaction();
+        $categories = $this->categoriesService->getAllUserCategories();
 
-            if($transaction->save()) {
-                return $this->redirect(['transaction/show', 'date' =>  Yii::$app->request->get('date'), 'sheet_id' => Yii::$app->request->get('sheet_id')]);
-            } else {
-                throw new NotFoundHttpException('Запись не найдена');
+        if ($transactionForm->load(Yii::$app->request->post()) && $transactionForm->validate()) {
+            if ($this->transactionsService->createTransaction($transactionForm)) {
+                return $this->redirect([
+                    'transaction/show',
+                    'date' => Yii::$app->request->get('date'),
+                    'sheet_id' => Yii::$app->request->get('sheet_id'),
+                ]);
             }
         }
 
-        return $this->render('create-transaction', 
-            ['transaction' => $model, 
-            'action' => 'create', 
-            'date' =>  Yii::$app->request->get('date'), 
-            'sheet_id' => Yii::$app->request->get('sheet_id'), 
-            'categories' => $categories]);
+        return $this->render('create-transaction', [
+            'transactionForm' => $transactionForm,
+            'action' => 'create',
+            'date' => Yii::$app->request->get('date'),
+            'sheetId' => Yii::$app->request->get('sheet_id'),
+            'categories' => $categories,
+        ]);
     }
     public function actionUpdate()
     {
-        $model = new CreateTransaction();
-        $transaction = Transaction::findOne(Yii::$app->request->get('id'));
-        $model->sheet_id = $transaction->sheet_id;
-        $model->category_id = $transaction->category_id;
-        $model->amount = $transaction->amount;
-        $model->transaction_date = $transaction->transaction_date;
-        $model->description = $transaction->description;
-        $categories = Category::findAll(['user_id' => Yii::$app->user->id]);
-        $date = Yii::$app->request->get('date');
+        $transactionForm = $this->transactionsService->bindCreateTransactionForm(Yii::$app->request->get('id'));
+        $categories = $this->categoriesService->getAllUserCategories();
+        $transactionDate = Yii::$app->request->get('date');
 
-        if($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $transaction->sheet_id = $model->sheet_id;
-            $transaction->category_id = $model->category_id;
-            $transaction->amount = floatval($model->amount);
-            $transaction->transaction_date = $model->transaction_date;
-            $transaction->description = $model->description;
-            $transaction->updated_at = date('Y-m-d H:i:s', time());
-
-            if($transaction->save()) {
-                return $this->redirect(['transaction/show', 'date' => $date, 'sheet_id' => Yii::$app->request->get('sheet_id')]);
+        if ($transactionForm->load(Yii::$app->request->post()) && $transactionForm->validate()) {
+            if ($this->transactionsService->updateTransaction(Yii::$app->request->get('id'), $transactionForm)) {
+                return $this->redirect(['transaction/show', 'date' => $transactionDate, 'sheet_id' => Yii::$app->request->get('sheet_id')]);
             } else {
-                throw new NotFoundHttpException('Запись не найдена');
+                throw new NotFoundHttpException('Transaction not found');
             }
         }
 
-        return  $this->render('create-transaction', ['transaction' => $model, 'action' => 'update', 'date' => $date, 'sheet_id' => $model->sheet_id, 'categories' => $categories]);
+        return $this->render('create-transaction', [
+            'transactionForm' => $transactionForm,
+            'action' => 'update',
+            'date' => $transactionDate,
+            'sheetId' => $transactionForm->sheet_id,
+            'categories' => $categories
+        ]);
     }
     public function actionDelete()
     {
-        $transaction = Transaction::findOne(Yii::$app->request->get('id'));
-        if($transaction->delete()) {
-            return $this->redirect(['transaction/show', 'date'=>Yii::$app->request->get('date') ]);
+        if($this->transactionsService->deleteTransaction(Yii::$app->request->get('id'))) {
+            return $this->redirect(['transaction/show', 'date'=>Yii::$app->request->get('date'), 'sheet_id' => Yii::$app->request->get('sheet_id')]);
         } else {
             throw new NotFoundHttpException('Запись не найдена');
         }
     }
-    public function actionCreateRecurringExpense() 
+    public function actionCreateRecurringTransactions()
     {
-        $model = new CreateRecurringExpenseForm();
-        $categories = Category::findAll(['user_id' => Yii::$app->user->id]);
+        $recurringTransactionForm = new CreateRecurringTransactionForm();
+        $categories = $this->categoriesService->getAllUserCategories();
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $transaction = Yii::$app->db->beginTransaction();
+        if ($recurringTransactionForm->load(Yii::$app->request->post()) && $recurringTransactionForm->validate()) {
+            $transactionResult = $this->transactionsService->createRecurringTransaction($recurringTransactionForm);
 
-            try {
-                $date = strtotime($model->transaction_date);
-                $record = new Transaction();
-                $record->sheet_id = $model->sheet_id;
-                $record->category_id = $model->category_id;
-                $record->amount = floatval($model->amount);
-                $record->transaction_date = date('Y-m-d H:i:s', $date);
-                $record->description = $model->description;
-                $record->created_at = date('Y-m-d H:i:s');
-                $record->updated_at = date('Y-m-d H:i:s');
-
-                if (!$record->save()) {
-                    throw new Exception('Не удалось сохранить первую транзакцию: ' . json_encode($record->errors));
-                }
-
-                for ($i = 1; $i < intval($model->quantity); $i++) {
-                    $newRecord = new Transaction();
-                    $newRecord->sheet_id = $model->sheet_id;
-                    $newRecord->category_id = $model->category_id;
-                    $newRecord->amount = floatval($model->amount);
-
-                    switch ($model->period) {
-                        case RecurringExpencePeriod::DAILY->value:
-                            $newRecord->transaction_date = date('Y-m-d H:i:s', strtotime($record->transaction_date . "+$i days"));
-                            break;
-                        case RecurringExpencePeriod::WEEKLY->value:
-                            $newRecord->transaction_date = date('Y-m-d H:i:s', strtotime($record->transaction_date . "+" . $i*6 . " days"));
-                            break;
-                        case RecurringExpencePeriod::MONTHLY->value:
-                            $newRecord->transaction_date = date('Y-m-d H:i:s', strtotime($record->transaction_date . "+$i months"));
-                            break;
-                        case RecurringExpencePeriod::YEARLY->value:
-                            $newRecord->transaction_date = date('Y-m-d H:i:s', strtotime($record->transaction_date . "+$i years"));
-                            break;
-                    }
-
-                    $newRecord->description = $model->description;
-                    $newRecord->created_at = date('Y-m-d H:i:s');
-                    $newRecord->updated_at = date('Y-m-d H:i:s');
-
-                    if (!$newRecord->save()) {
-                        throw new Exception('Ошибка при сохранении повторяющейся транзакции: ' . json_encode($newRecord->errors));
-                    }
-                }
-                $transaction->commit();
-            } catch (Exception $e) {
-                $transaction->rollBack();
-                return "Transaction ended with error and has been rollbacked. Message: " . $e->getMessage();
+            if ($transactionResult === true) {
+                return $this->redirect(['budget-sheets/show', 'id' => $recurringTransactionForm->sheet_id]);
             }
-
-            return $this->redirect(['budget-sheets/show', 'id' => $model->sheet_id]);
         }
 
-        return $this->render('create-recurring-expense', 
-            ['model' => $model,
+        return $this->render('create-recurring-expense', [
+            'model' => $recurringTransactionForm,
             'categories' => $categories,
-            'sheet_id' => Yii::$app->request->get('sheet_id')
-            ]);
-    }    
+            'sheetId' => Yii::$app->request->get('sheet_id'),
+        ]);
+    }
 }

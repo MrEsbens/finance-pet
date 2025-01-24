@@ -4,58 +4,82 @@ namespace app\controllers;
 
 use app\models\CreateCategory;
 use yii\web\Controller;
-use app\models\Category;
 use Yii;
-use yii\web\NotFoundHttpException;
+use Yii\db\Exception;
+use app\components\services\CategoriesService;
+use app\components\services\UserService;
 
 class CategoriesController extends Controller
 {
+    private CategoriesService $categoriesService;
+    private UserService $userService;
+    
+    public function __construct(
+        string $id,
+        $module,
+        CategoriesService $categoriesService,
+        UserService $userService,
+        array $config = []
+    ) {
+        $this->categoriesService = $categoriesService;
+        $this->userService = $userService;
+        parent::__construct($id, $module, $config);
+    }
     public function actionShow()
     {
-        $categories = Category::find()->where(['user_id' => Yii::$app->user->id])->all();
-        return $this->render('categories', ['categories' => $categories]);
+        if($this->userService->isGuest()) {
+            return $this->goHome();
+        }
+
+        $userCategories = $this->categoriesService->getAllUserCategories();
+
+        return $this->render('categories', [
+            'categories' => $userCategories,
+        ]);
     }
     public function actionCreate()
     {
-        $model = new CreateCategory();
-        if($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $category = new Category();
-            $category->user_id = Yii::$app->user->id;
-            $category->name = $model->name;
-            $category->type = $model->type;
-            $category->created_at = date('Y-m-d H:i:s', time());
-            $category->updated_at = date('Y-m-d H:i:s', time());
-            if ($category->save()) {
-                $this->redirect(['categories/show']);
+        $createCategoryModel = new CreateCategory();
+
+        if ($createCategoryModel->load(Yii::$app->request->post()) && $createCategoryModel->validate()) {
+            if ($this->categoriesService->createCategory($createCategoryModel)) {
+                return $this->redirect(['categories/show']);
             }
         }
-        return $this->render('create-category', ['category' => $model, 'action' => 'create', 'type' => Yii::$app->request->get('type')]);
+
+        return $this->render('create-category', [
+            'model' => $createCategoryModel,
+            'action' => 'create',
+            'type' => Yii::$app->request->get('type'),
+        ]);
     }
     public function actionUpdate()
     {
-        $model = new CreateCategory();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $category = Category::findOne(Yii::$app->request->get('id'));
-            if($category) {
-                $category->name = $model->name;
-                $category->updated_at = date('Y-m-d H:i:s', time());
-                if ($category->save()) {
-                    $this->redirect(['categories/show']);
-                }
+        $categoryId = Yii::$app->request->get('id');
+        $categoryModel = $this->categoriesService->bindCategoryForm($categoryId);
+
+        if ($categoryModel->load(Yii::$app->request->post()) && $categoryModel->validate()) {
+            if ($this->categoriesService->updateCategory($categoryId, $categoryModel)) {
+                return $this->redirect(['categories/show']);
             } else {
-                throw new NotFoundHttpException('Category not found');
+                throw new Exception('Failed to update category.');
             }
         }
-        return $this->render('create-category', ['category' => $model, 'action' => 'update', 'type' => Yii::$app->request->get('type')]);
+
+        return $this->render('create-category', [
+            'model' => $categoryModel,
+            'action' => 'update',
+            'type' => Yii::$app->request->get('type')
+        ]);
     }
     public function actionDelete()
     {
-        $category = Category::findOne(Yii::$app->request->get('id'));
-        if($category) {
-            $category->delete();
+        $categoryId = (int)Yii::$app->request->get('id');
+
+        if ($this->categoriesService->deleteCategory($categoryId)) {
             $this->redirect(['categories/show']);
         } else {
-            throw new NotFoundHttpException('Category not found');
+            throw new \yii\db\Exception('Failed to delete category.');
         }
     }
 }

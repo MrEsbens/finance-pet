@@ -18,10 +18,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'change_password')->checkbox(['id' => 'change-password-checkbox'])?>
 
-        <div id="password-fields" style="display: none;">
-            <?= $form->field($model, 'old_password')->passwordInput()?>
-            <?= $form->field($model, 'password')->passwordInput()?>
-            <?= $form->field($model, 'password_repeat')->passwordInput()?>
+        <div id="password-fields">
+            <?= $form->field($model, 'old_password')->passwordInput(['id' => 'usersettingsform-old_password'])?>
+            <?= $form->field($model, 'password')->passwordInput(['id' => 'usersettingsform-password'])?>
+            <?= $form->field($model, 'password_repeat')->passwordInput(['id' => 'usersettingsform-password_repeat'])?>
         </div>
 
         <div class="form-group">
@@ -34,16 +34,28 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php
 $script = <<< JS
+$(document).ready(function() {
+    if ($('#change-password-checkbox').is(':checked')) {
+            $('#usersettingsform-old_password').prop('disabled', false);
+            $('#usersettingsform-password').prop('disabled', false);
+            $('#usersettingsform-password_repeat').prop('disabled', false);
+        } else {
+            $('#usersettingsform-old_password').prop('disabled', true).val('');
+            $('#usersettingsform-password').prop('disabled', true).val('');
+            $('#usersettingsform-password_repeat').prop('disabled', true).val('');
+        }
     $('#change-password-checkbox').change(function() {
         if ($(this).is(':checked')) {
-            $('#password-fields').show();
+            $('#usersettingsform-old_password').prop('disabled', false);
+            $('#usersettingsform-password').prop('disabled', false);
+            $('#usersettingsform-password_repeat').prop('disabled', false);
         } else {
-            $('#password-fields').hide();
-            $('#usersettingsform-old_password').val('');
-            $('#usersettingsform-password').val('');
-            $('#usersettingsform-password_repeat').val('');
+            $('#usersettingsform-old_password').prop('disabled', true).val('');
+            $('#usersettingsform-password').prop('disabled', true).val('');
+            $('#usersettingsform-password_repeat').prop('disabled', true).val('');
         }
     });
+});
 JS;
 $this->registerJs($script);
 ?>

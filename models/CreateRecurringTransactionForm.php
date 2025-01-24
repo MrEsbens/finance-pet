@@ -3,7 +3,7 @@ namespace app\models;
 
 use yii\base\Model;
 
-class CreateRecurringExpenseForm extends Model
+class CreateRecurringTransactionForm extends Model
 {
     public $sheet_id;
     public $category_id;

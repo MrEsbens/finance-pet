@@ -9,7 +9,7 @@ use app\models\enums\CategoryType;
 /* @var $this yii\web\View */
 /* @var $date */
 /* @var $transactions array */
-/* @var $sheet_id */
+/* @var $sheetId */
 
 $this->title = "Транзакции за ".date('d-m-Y',strtotime($date));
 $this->params['breadcrumbs'][] = $this->title;
@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1 class="text-center"><?= Html::encode($this->title)?></h1>
 
     <div class="d-flex justify-content-end mb-4">
-        <?= Html::a('Добавить доход/расход', Url::to(['transaction/create', 'date' => $date, 'sheet_id' => $sheet_id]), ['class' => 'btn btn-primary'])?>
+        <?= Html::a('Добавить доход/расход', Url::to(['transaction/create', 'date' => $date, 'sheet_id' => $sheetId]), ['class' => 'btn btn-primary'])?>
     </div>
 
     <div class="table-responsive">
@@ -62,13 +62,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'format' => 'raw',
                     'value' => function($model) {
-                        return Html::a('&#9999', Url::to(['transaction/update', 'id' => $model['data']['id'], 'date' => $model['data']['transaction_date'], 'sheet_id' => $model['data']['sheet_id']]));
+                        return Html::a('&#9999', Url::to(['transaction/update', 'id' => $model['data']['id'], 'date' => $model['data']['transaction_date'], 'sheet_id' => $model['data']['sheet_id'] ]));
                     },
                 ],
                 [
                     'format' => 'raw',
                     'value' => function($model) {
-                        return Html::a('&#10060', Url::to(['transaction/delete', 'id' => $model['data']['id'], 'date' => $model['data']['transaction_date'] ]));
+                        return Html::a('&#10060', Url::to(['transaction/delete', 'id' => $model['data']['id'], 'date' => $model['data']['transaction_date'], 'sheet_id' => $model['data']['sheet_id'] ]));
                     }
                 ]
             ],

@@ -1,7 +1,7 @@
 <?php
 /** @var string $action */
 /** @var string $type */
-/** @var $category */
+/** @var $model */
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
@@ -22,11 +22,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php $form = ActiveForm::begin(); ?>
 
-        <?=$form->field($category, 'name')->label("Название категории")->textInput(['autofocus' => true]) ?>
-        <?=Html::activeHiddenInput($category, 'type', ['value' => $type]);?>
+        <?=$form->field($model, 'name')->label("Название категории")->textInput(['autofocus' => true]) ?>
+        <?=Html::activeHiddenInput($model, 'type', ['value' => $type]);?>
         <?php
         if($action === 'update') {
-            echo Html::activeHiddenInput($category, 'id', ['value' => Yii::$app->request->get('id')]);
+            echo Html::activeHiddenInput($model, 'id', ['value' => Yii::$app->request->get('id')]);
         }
         ?>
 

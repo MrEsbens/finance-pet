@@ -2,14 +2,14 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-/** @var $budget_sheet */
+/** @var $budgetSheet */
 /** @var $currentMonth */
 /** @var $currentYear */
 /** @var $daysInMonth */
 /** @var $expenses */
 /** @var $incomes */
 
-$this->title = $budget_sheet->name;
+$this->title = $budgetSheet->name;
 $this->params['breadcrumbs'][] = $this->title;
 $prevMonth = $currentMonth == 1 ? 12 : $currentMonth - 1;
 $prevYear = $currentMonth == 1 ? $currentYear - 1 : $currentYear;
@@ -33,15 +33,15 @@ $monthsRu = [
 <div class="container mt-5">
     <h1 class="text-center"><?= Html::encode($this->title) ?></h1>
     <div class="d-flex justify-content-start mb-4">
-        <?= Html::a('Категории', ['categories/show', 'sheet_id' => $budget_sheet->id], ['class' => 'btn btn-outline-info me-2']) ?>
+        <?= Html::a('Категории', ['categories/show', 'sheet_id' => $budgetSheet->id], ['class' => 'btn btn-outline-info me-2']) ?>
     </div>
     <div class="d-flex justify-content-start mb-4">
-        <?= Html::a('Добавить периодические траты', ['transaction/create-recurring-expense', 'sheet_id' => $budget_sheet->id], ['class' => 'btn btn-outline-info me-2']) ?>
+        <?= Html::a('Добавить периодические транзакции', ['transaction/create-recurring-transactions', 'sheet_id' => $budgetSheet->id], ['class' => 'btn btn-outline-info me-2']) ?>
     </div>
     <div class="d-flex justify-content-between mb-4">
-        <?= Html::a('Предыдущий месяц', ['id' => $budget_sheet->id, 'budget-sheets/show', 'month' => sprintf('%02d', $prevMonth), 'year' => $prevYear], ['class' => 'btn btn-secondary']) ?>
+        <?= Html::a('Предыдущий месяц', ['id' => $budgetSheet->id, 'budget-sheets/show', 'month' => sprintf('%02d', $prevMonth), 'year' => $prevYear], ['class' => 'btn btn-secondary']) ?>
         <h2 class="text-center"><?= Html::encode($monthsRu[sprintf('%02d', $currentMonth)]) . " " . $currentYear ?></h2>
-        <?= Html::a('Следующий месяц', ['id' => $budget_sheet->id, 'budget-sheets/show', 'month' => sprintf('%02d', $nextMonth), 'year' => $nextYear], ['class' => 'btn btn-secondary']) ?>
+        <?= Html::a('Следующий месяц', ['id' => $budgetSheet->id, 'budget-sheets/show', 'month' => sprintf('%02d', $nextMonth), 'year' => $nextYear], ['class' => 'btn btn-secondary']) ?>
     </div>
     <div class="calendar">
         <div class="row">
@@ -61,7 +61,7 @@ $monthsRu = [
                         'day' => $day,
                         'month' => $currentMonth,
                         'year' => $currentYear,
-                        'sheet_id' => $budget_sheet->id]),
+                        'sheet_id' => $budgetSheet->id]),
                         ['class' => 'h5']) ?>
                     <p>Расходы: <?= Html::encode(isset($expenses[$day]) ? number_format($expenses[$day], 2, ',', ' ') : 0) ?></p>
                     <p>Доходы: <?= Html::encode(isset($incomes[$day]) ? number_format($incomes[$day], 2, ',', ' ') : 0) ?></p>

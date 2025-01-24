@@ -1,27 +1,36 @@
 <?php
 namespace app\controllers;
 
-use app\models\Category;
-use app\models\enums\CategoryType;
+use app\components\services\BudgetSheetsService;
+use app\components\services\UserService;
 use yii\web\Controller;
-use app\models\BudgetSheet;
 use app\models\CreateBudgetSheet;
 use Yii;
-use yii\web\NotFoundHttpException;
 use yii\db\Exception;
-use app\models\Transaction;
 
 class BudgetSheetsController extends Controller
 {
+    private BudgetSheetsService $budgetSheetsService;
+    private UserService $userService;
+
+    public function __construct(
+        $id,
+        $module,
+        BudgetSheetsService $budgetSheetsService,
+        UserService $userService,
+        array $config = []
+    ) {
+        $this->budgetSheetsService = $budgetSheetsService;
+        $this->userService = $userService;
+        parent::__construct($id, $module, $config);
+    }
     public function actionIndex()
     {
-        if(Yii::$app->user->isGuest) {
+        if($this->userService->isGuest()) {
             return $this->goHome();
         }
 
-        $budget_sheets = BudgetSheet::findAll([
-            'user_id' => Yii::$app->user->id,
-        ]);
+        $budget_sheets = $this->budgetSheetsService->getBudgetSheets();
 
         return $this->render('budget-sheets', ['budget_sheets'=>$budget_sheets]);
     }
@@ -30,34 +39,27 @@ class BudgetSheetsController extends Controller
         $model = new CreateBudgetSheet();
 
         if($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $budget_sheet = new BudgetSheet();
-            $budget_sheet->user_id = Yii::$app->user->id;
-            $budget_sheet->name = $model->name;
-            $budget_sheet->created_at = date('Y-m-d H:i:s', time());
-            $budget_sheet->updated_at = date('Y-m-d H:i:s', time());
-            if($budget_sheet->save()) {
+            
+            if($this->budgetSheetsService->createBudgetSheet($model)) {
                 $this->redirect(['budget-sheets/index']);
+            } else {
+                throw new Exception('Failed to save budget sheet.');
             }
         }
 
         return $this->render('create-budget-sheet', ['budget_sheet' => $model, 'action'=>'create']);
     }
+
     public function actionUpdate()
     {
-        $model = new CreateBudgetSheet();
-        if($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $budget_sheet = BudgetSheet::findOne(Yii::$app->request->post('CreateBudgetSheet')['id']);
-            if($budget_sheet) {
-                $budget_sheet->name = $model->name;
-                $budget_sheet->updated_at = date('Y-m-d H:i:s', time());
+        $budgetSheetId = Yii::$app->request->get('id');
+        $model = $this->budgetSheetsService->bindCreateBudgetSheetForm($budgetSheetId);
 
-                if($budget_sheet->save()) {
-                    $this->redirect(['budget-sheets/index']);
-                } else {
-                    throw new Exception('Failed to save.');
-                } 
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            if($this->budgetSheetsService->updateBudgetSheet($budgetSheetId, $model)) {
+                $this->redirect(['budget-sheets/index']);
             } else {
-                throw new NotFoundHttpException('Budget sheet not found.');
+                throw new Exception('Failed to update budget sheet.');
             }
         }
 
@@ -65,44 +67,26 @@ class BudgetSheetsController extends Controller
     }
     public function actionDelete()
     {
-        $budget_sheet = BudgetSheet::findOne(Yii::$app->request->get('id'));
-        if($budget_sheet) {
-            if($budget_sheet->delete()) {
-                $this->redirect(['budget-sheets/index']);
-            }
+        $budgetSheetId = Yii::$app->request->get('id');
+
+        if($this->budgetSheetsService->deleteBudgetSheet($budgetSheetId)) {
+            $this->redirect(['budget-sheets/index']);
         } else {
-            throw new NotFoundHttpException('Budget sheet not found.');
+            throw new Exception('Failed to delete budget sheet.');
         }
     }
     public function actionShow()
     {
-        $budget_sheet = BudgetSheet::findOne(Yii::$app->request->get('id'));
-        $currentMonth = isset($_GET['month']) ? (int)$_GET['month'] : date('m');
-        $currentYear = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
-        $daysInMonth = date('t', mktime(0, 0, 0, $currentMonth, 1, $currentYear));
-        $expenses = [];
-        $incomes = [];
-        $query = Transaction::find()
-            ->where(['>=', 'transaction_date', $currentYear.'-'.$currentMonth.'-01'])
-            ->andWhere(['<=', 'transaction_date', $currentYear.'-'.$currentMonth.'-'.$daysInMonth])
-            ->andWhere(['sheet_id' => $budget_sheet->id])
-            ->all();
+        [
+            'budgetSheet' => $budgetSheet,
+            'currentMonth' => $currentMonth,
+            'currentYear' => $currentYear,
+            'daysInMonth' => $daysInMonth,
+            'expenses' => $expenses,
+            'incomes' => $incomes
+        ] = $this->budgetSheetsService->showBudgetSheet(Yii::$app->request->get('id'));
 
-        for ($day = 1; $day <= $daysInMonth; $day++) {
-            $incomes[$day] = 0;
-            $expenses[$day] = 0;
-        }
-
-        foreach ($query as $res) {
-            $category = Category::findOne($res->category_id);
-            if ($category->type == CategoryType::Income->value) {
-                $incomes[date('j', strtotime($res->transaction_date))] += $res->amount;
-            } else {
-                $expenses[date('j', strtotime($res->transaction_date))] += $res->amount;
-            }
-        }
-
-        return $this->render('sheet-show', ['budget_sheet'=>$budget_sheet,
+        return $this->render('sheet-show', ['budgetSheet'=>$budgetSheet,
             'currentMonth'=>$currentMonth,
             'currentYear'=>$currentYear,
             'daysInMonth'=>$daysInMonth,

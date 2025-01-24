@@ -1,15 +1,14 @@
 <?php
 
-global $model;
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use app\models\enums\CategoryType;
 
 /** @var  $action */
-/** @var  $transaction */
+/** @var  $transactionForm */
 /** @var  $date */
-/** @var  $sheet_id */
+/** @var  $sheetId */
 /** @var  $categories */
 
 
@@ -51,12 +50,18 @@ $this->params['breadcrumbs'][] = $this->title;?>
 
         <?php $form = ActiveForm::begin();?>
 
-        <?=$form->field($transaction, 'amount')->label("Сумма")->textInput(['type' => 'number', 'step' => '0.01']);?>
-        <?=$form->field($transaction, 'description')->label('Дополнительное описание')->textInput();?>
-        <?=$form->field($transaction, 'category_id')->label('Тип')->dropDownList($category_types, ['prompt' => 'Выберите тип транзакции', 'id' => 'category-type-dropdown']);?>
-        <?=$form->field($transaction, 'category_id')->label('Категория')->dropDownList([], ['prompt' => 'Выберите категорию', 'id' => 'dynamic-category-dropdown']);?>
-        <?=Html::activeHiddenInput($transaction, 'transaction_date', ['value' => $date]);?>
-        <?=Html::activeHiddenInput($transaction, 'sheet_id', ['value' => $sheet_id]);?>
+        <?=$form->field($transactionForm, 'amount')->label("Сумма")->textInput(['type' => 'number', 'step' => '0.01']);?>
+        <?=$form->field($transactionForm, 'description')->label('Дополнительное описание')->textInput();?>
+        <?= Html::label('Тип', 'category-type-dropdown') ?>
+        <?= Html::dropDownList('category_type', null, $category_types, [
+            'prompt' => 'Выберите тип транзакции',
+            'id' => 'category-type-dropdown',
+            'class' => 'form-control',
+            'name' => '',
+        ]) ?>        
+        <?=$form->field($transactionForm, 'category_id')->label('Категория')->dropDownList([], ['prompt' => 'Выберите категорию', 'id' => 'dynamic-category-dropdown']);?>
+        <?=Html::activeHiddenInput($transactionForm, 'transaction_date', ['value' => $date]);?>
+        <?=Html::activeHiddenInput($transactionForm, 'sheet_id', ['value' => $sheetId]);?>
 
         <div class="form-group">
             <div>

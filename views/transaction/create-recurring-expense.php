@@ -62,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($model, 'category_id')->label('Категория')->dropDownList([], ['prompt' => 'Выберите категорию', 'id' => 'dynamic-category-dropdown']);?>
             <?= $form->field($model, 'period')->label('Период')->dropDownList($period_types, ['prompt' => 'Выберите период']);?>
             <?= $form->field($model, 'quantity')->label('Количество транзакций')->textInput(['type' => 'number', 'min' => 0]);?>
-            <?= Html::activeHiddenInput($model, 'sheet_id', ['value' => $sheet_id]);?>
+            <?= Html::activeHiddenInput($model, 'sheet_id', ['value' => $sheetId]);?>
 
             <div class="form-group">
                 <div>

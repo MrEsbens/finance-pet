@@ -27,18 +27,19 @@ class LoginForm extends Model
         ];
     }
 
-    public function validatePassword($attribute, $params)
+    public function validatePassword($attribute)
     {
         if (!$this->hasErrors()) {
-            $user = $this->getUser();
-            if (!$user) {
-                $this->addError($attribute, 'Некорректное имя пользователя или пароль.');
-            }
-            if (Yii::$app->getSecurity()->validatePassword($this->password, $user->getPasswordHash())) {
-                return true;
+            $this->getUser();
+            if ($this->_user) {
+                if (Yii::$app->getSecurity()->validatePassword($this->password, $this->_user->getPasswordHash())) {
+                    return true;
+                } else {
+                    $this->addError($attribute, 'Некорректное имя пользователя или пароль.');
+                }
             } else {
                 $this->addError($attribute, 'Некорректное имя пользователя или пароль.');
-            }
+            }  
         }
         return false;
     }
@@ -61,8 +62,8 @@ class LoginForm extends Model
     {
         if ($this->_user === null) {
             $this->_user = User::findByUsername($this->username);
+        } else {
+            return $this->_user;
         }
-
-        return $this->_user;
     }
 }

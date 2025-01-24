@@ -17,6 +17,7 @@ class RegistrationForm extends Model
             [['username', 'password', 'email'], 'required'],
             ['username', 'unique', 'targetClass' => User::class, 'targetAttribute' => 'username'],
             ['email', 'email'],
+            ['email', 'unique', 'targetClass' => User::class, 'targetAttribute' => 'email'],
             ['password', PasswordValidator::class],
         ];
     }
